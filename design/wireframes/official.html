@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Regional Official Command — SETU AI</title>
+  <link rel="stylesheet" href="tokens.css">
+  <style>
+    .command-viewport {
+      display: grid;
+      grid-template-columns: 360px 1fr 400px;
+      height: calc(100vh - 68px);
+      overflow: hidden;
+      background: var(--bg-app);
+    }
+    
+    /* Left: Ranked Project Queue */
+    .queue-sidebar {
+      background: #FFFFFF;
+      border-right: 1px solid var(--border-default);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+    .queue-header {
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--border-subtle);
+      background: #FFFFFF;
+    }
+    .queue-scroll {
+      overflow-y: auto;
+      flex: 1;
+      padding: 14px;
+    }
+    .queue-card {
+      border: 1px solid var(--border-default);
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      background: #FFFFFF;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .queue-card:hover {
+      border-color: var(--navy-700);
+      background: var(--sand-50);
+      transform: translateY(-1px);
+    }
+    .queue-card.selected {
+      border-color: var(--navy-850);
+      background: var(--navy-50);
+      border-left: 5px solid var(--navy-850);
+      box-shadow: 0 4px 12px rgba(19, 42, 76, 0.06);
+    }
+    .queue-card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .rank-tag {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--navy-950);
+      background: var(--sand-300);
+      padding: 2px 7px;
+      border-radius: 4px;
+      letter-spacing: 0.04em;
+    }
+    .queue-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--navy-950);
+      line-height: 1.35;
+      margin-bottom: 6px;
+    }
+    .queue-meta-row {
+      display: flex;
+      gap: 12px;
+      font-size: 12px;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+
+    /* Middle: Geospatial Map Canvas */
+    .map-canvas-area {
+      position: relative;
+      background: #D9E2EC;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .map-svg-surface {
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 50% 50%, #E9EFF6 0%, #CCD9E8 100%);
+      position: relative;
+    }
+    .map-grid-layer {
+      position: absolute;
+      inset: 0;
+      background-image: 
+        linear-gradient(rgba(19, 42, 76, 0.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(19, 42, 76, 0.06) 1px, transparent 1px);
+      background-size: 44px 44px;
+    }
+    
+    /* Hotspot Cluster Pins on Map */
+    .cluster-pin {
+      position: absolute;
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: #FFFFFF;
+      font-weight: 800;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+      transition: all 0.25s ease;
+      z-index: 10;
+    }
+    .cluster-pin:hover {
+      transform: scale(1.15);
+      z-index: 25;
+    }
+    /* Terracotta for Critical Urgency Hotspot */
+    .pin-urgent {
+      left: 48%;
+      top: 40%;
+      width: 74px;
+      height: 74px;
+      background: radial-gradient(circle, var(--terracotta) 0%, var(--terracotta-800) 100%);
+      border: 3px solid #FFFFFF;
+      animation: pulse-ring 2.2s infinite;
+    }
+    @keyframes pulse-ring {
+      0% { box-shadow: 0 0 0 0 rgba(193, 80, 46, 0.6); }
+      70% { box-shadow: 0 0 0 18px rgba(193, 80, 46, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(193, 80, 46, 0); }
+    }
+    .pin-navy {
+      left: 26%;
+      top: 58%;
+      width: 60px;
+      height: 60px;
+      background: radial-gradient(circle, var(--navy-700) 0%, var(--navy-950) 100%);
+      border: 2.5px solid #FFFFFF;
+    }
+    .pin-slate {
+      left: 68%;
+      top: 62%;
+      width: 52px;
+      height: 52px;
+      background: radial-gradient(circle, #2C5282 0%, #1A365D 100%);
+      border: 2px solid #FFFFFF;
+    }
+
+    .map-floating-bar {
+      position: absolute;
+      top: 18px;
+      left: 20px;
+      right: 20px;
+      display: flex;
+      justify-content: space-between;
+      pointer-events: none;
+      z-index: 20;
+    }
+    .map-glass-card {
+      pointer-events: auto;
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid var(--border-default);
+      border-radius: 8px;
+      padding: 8px 16px;
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      font-size: 12.5px;
+      font-weight: 600;
+      box-shadow: var(--shadow-sm);
+    }
+    .map-dock-legend {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border-default);
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: 11.5px;
+      box-shadow: var(--shadow-sm);
+      z-index: 20;
+    }
+
+    /* Right: Deep Dive & Grounded RAG */
+    .detail-sidebar {
+      background: #FFFFFF;
+      border-left: 1px solid var(--border-default);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      overflow-y: auto;
+    }
+    .detail-block {
+      padding: 24px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    /* Formula Breakdown Table */
+    .formula-table-view {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      margin-top: 12px;
+    }
+    .formula-table-view th {
+      text-align: left;
+      padding: 6px 0;
+      color: var(--text-muted);
+      font-weight: 700;
+      border-bottom: 1px solid var(--border-subtle);
+      text-transform: uppercase;
+      font-size: 10.5px;
+      letter-spacing: 0.04em;
+    }
+    .formula-table-view td {
+      padding: 7px 0;
+      border-bottom: 1px solid #F3F5F8;
+    }
+
+    /* RAG Policy Assistant */
+    .rag-panel {
+      background: var(--sand-50);
+      border: 1px solid var(--sand-400);
+      border-radius: 8px;
+      padding: 16px;
+      margin-top: 14px;
+    }
+    .rag-input-box {
+      width: 100%;
+      border: 1px solid var(--border-default);
+      border-radius: 6px;
+      padding: 9px 12px;
+      font-size: 12.5px;
+      background: #FFFFFF;
+      outline: none;
+      margin-bottom: 10px;
+      font-family: var(--font-sans);
+    }
+    .rag-citation-box {
+      background: #FFFFFF;
+      border: 1px solid var(--sand-400);
+      border-left: 3.5px solid var(--navy-850);
+      border-radius: 4px;
+      padding: 10px 12px;
+      font-size: 11.5px;
+      margin-top: 10px;
+      line-height: 1.45;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <header class="top-nav">
+    <div class="brand-container">
+      <div class="brand-symbol">से</div>
+      <a href="index.html" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 8px;">
+        <span class="brand-badge">SETU AI</span>
+        <span class="brand-title">Regional Command Center</span>
+      </a>
+      <span class="brand-tagline">State: Maharashtra (IN-MH) · Division: Aurangabad</span>
+    </div>
+    <div class="nav-links">
+      <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: #1B7A53; background: #EDF7F2; padding: 4px 10px; border-radius: 14px; border: 1px solid #C5E6D7; font-weight: 600;">
+        <span style="width: 7px; height: 7px; border-radius: 50%; background: #1B7A53;"></span>
+        WebSocket Live (Region Stream)
+      </div>
+      <select class="lang-select-box" style="font-size: 12.5px;">
+        <option>Region: Maharashtra (India)</option>
+        <option>Region: Minas Gerais (Brazil)</option>
+        <option>Region: Bihar (India)</option>
+      </select>
+      <a href="admin.html" class="nav-link">National Leaderboard →</a>
+    </div>
+  </header>
+
+  <!-- 3-Column Command Viewport -->
+  <div class="command-viewport">
+
+    <!-- LEFT: Ranked Project Queue -->
+    <div class="queue-sidebar">
+      <div class="queue-header">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <h2 style="font-size: 16px;">Ranked Capital Works</h2>
+          <span class="badge badge-sand">18 Identified</span>
+        </div>
+        <div style="font-size: 12px; color: var(--text-secondary); margin-top: 3px;">
+          Ranked by Explainable Priority Score Formula
+        </div>
+        <div style="display: flex; gap: 8px; margin-top: 12px;">
+          <button class="btn btn-outline" style="font-size: 11.5px; padding: 6px 12px; flex: 1;" onclick="triggerHDBSCAN()">
+            🔄 Run Clustering Now
+          </button>
+          <button class="btn btn-outline" style="font-size: 11.5px; padding: 6px 10px;">
+            Filter ▾
+          </button>
+        </div>
+      </div>
+
+      <div class="queue-scroll">
+        
+        <!-- Item 1 (Active) -->
+        <div class="queue-card selected" onclick="pickProject(1)">
+          <div class="queue-card-top">
+            <span class="rank-tag">RANK #1 · WATER</span>
+            <!-- Terracotta ONLY for high priority/urgency -->
+            <span style="font-size: 13.5px; font-weight: 800; color: var(--terracotta);">Score: 91.4</span>
+          </div>
+          <div class="queue-title">Badnapur Feeder Pipeline & Ground Treatment Renewal</div>
+          <div class="queue-meta-row">
+            <span>👥 342 Citizen Requests</span>
+            <span>💰 ₹3.8 Cr ($460K)</span>
+          </div>
+          <div class="priority-meter">
+            <div class="segment-volume" style="width: 35%;" title="Demand Volume: 35%"></div>
+            <div class="segment-urgency" style="width: 20%;" title="Urgency: 20%"></div>
+            <div class="segment-vulnerability" style="width: 18%;" title="Vulnerability: 18%"></div>
+            <div class="segment-infra" style="width: 12%;" title="Deficit: 12%"></div>
+            <div class="segment-budget" style="width: 6.4%;" title="Plan: 6.4%"></div>
+          </div>
+        </div>
+
+        <!-- Item 2 -->
+        <div class="queue-card" onclick="pickProject(2)">
+          <div class="queue-card-top">
+            <span class="rank-tag">RANK #2 · ROADS</span>
+            <span style="font-size: 13.5px; font-weight: 800; color: var(--navy-950);">Score: 86.8</span>
+          </div>
+          <div class="queue-title">State Highway 176 Critical Culvert & Drainage Overhaul</div>
+          <div class="queue-meta-row">
+            <span>👥 215 Citizen Requests</span>
+            <span>💰 ₹6.2 Cr ($750K)</span>
+          </div>
+          <div class="priority-meter">
+            <div class="segment-volume" style="width: 28%;"></div>
+            <div class="segment-urgency" style="width: 15%;"></div>
+            <div class="segment-vulnerability" style="width: 20%;"></div>
+            <div class="segment-infra" style="width: 15%;"></div>
+            <div class="segment-budget" style="width: 8.8%;"></div>
+          </div>
+        </div>
+
+        <!-- Item 3 -->
+        <div class="queue-card" onclick="pickProject(3)">
+          <div class="queue-card-top">
+            <span class="rank-tag">RANK #3 · HEALTH</span>
+            <span style="font-size: 13.5px; font-weight: 800; color: var(--navy-950);">Score: 79.2</span>
+          </div>
+          <div class="queue-title">Sub-District Hospital Solar Backup & Cold Chain Power</div>
+          <div class="queue-meta-row">
+            <span>👥 140 Citizen Requests</span>
+            <span>💰 ₹1.4 Cr ($170K)</span>
+          </div>
+          <div class="priority-meter">
+            <div class="segment-volume" style="width: 22%;"></div>
+            <div class="segment-urgency" style="width: 20%;"></div>
+            <div class="segment-vulnerability" style="width: 18%;"></div>
+            <div class="segment-infra" style="width: 10%;"></div>
+            <div class="segment-budget" style="width: 9.2%;"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- MIDDLE: Geospatial Canvas -->
+    <div class="map-canvas-area">
+      <div class="map-floating-bar">
+        <div class="map-glass-card">
+          <span>Layers:</span>
+          <label style="cursor: pointer;"><input type="checkbox" checked> HDBSCAN Hotspots</label>
+          <label style="cursor: pointer;"><input type="checkbox" checked> Demographic Vulnerability</label>
+          <label style="cursor: pointer;"><input type="checkbox"> Infra Asset Deficit</label>
+        </div>
+        <div class="map-glass-card">
+          <span>Sector:</span>
+          <select style="border: none; background: transparent; font-weight: 700; font-size: 12px; outline: none; color: var(--navy-850);">
+            <option>All Sectors (Water, Roads, Power...)</option>
+            <option>Water Supply (6 Hotspots)</option>
+            <option>Roads & Bridges (5 Hotspots)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="map-svg-surface">
+        <div class="map-grid-layer"></div>
+
+        <!-- Hotspot Pin 1 (Terracotta - Urgent) -->
+        <div class="cluster-pin pin-urgent" onclick="pickProject(1)" title="Hotspot #IN-MH-WTR-04: 342 Citizen Requests">
+          <div style="font-size: 11px;">#1 · 342</div>
+          <div style="font-size: 9px; opacity: 0.95;">WATER · URGENT</div>
+        </div>
+
+        <!-- Hotspot Pin 2 (Navy) -->
+        <div class="cluster-pin pin-navy" onclick="pickProject(2)" title="Hotspot #IN-MH-RD-08: 215 Citizen Requests">
+          <div style="font-size: 11px;">#2 · 215</div>
+          <div style="font-size: 9px; opacity: 0.95;">ROADS</div>
+        </div>
+
+        <!-- Hotspot Pin 3 (Slate) -->
+        <div class="cluster-pin pin-slate" onclick="pickProject(3)" title="Hotspot #IN-MH-HLT-02: 140 Citizen Requests">
+          <div style="font-size: 11px;">#3 · 140</div>
+          <div style="font-size: 9px; opacity: 0.95;">HEALTH</div>
+        </div>
+      </div>
+
+      <div class="map-dock-legend">
+        <strong>Map Density & Urgency Legend</strong>
+        <div style="display: flex; align-items: center; gap: 8px; margin-top: 5px;">
+          <div style="width: 12px; height: 12px; border-radius: 50%; background: var(--terracotta);"></div>
+          <span>Urgent Hotspot (Urgency Score &gt; 0.8)</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px; margin-top: 4px;">
+          <div style="width: 12px; height: 12px; border-radius: 50%; background: var(--navy-850);"></div>
+          <span>High Demand Cluster (&gt; 150 Ingests)</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Explainable Score & Grounded Policy RAG -->
+    <div class="detail-sidebar">
+      
+      <div class="detail-block">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+          <span class="badge badge-sand">Hotspot #IN-MH-WTR-04</span>
+          <!-- Terracotta ONLY for high priority badge -->
+          <span class="badge badge-urgency">Priority Score: 91.4 / 100</span>
+        </div>
+        <h3 style="font-size: 17px; margin: 10px 0 6px;">
+          Badnapur Feeder Pipeline Renewal
+        </h3>
+        <p style="font-size: 12.5px; color: var(--text-secondary); line-height: 1.45;">
+          Spatial cluster of 342 distinct reports across 4 gram panchayats. Severe contamination and pressure collapse reported following monsoon culvert damage.
+        </p>
+
+        <!-- Metric snapshot -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 16px 0;">
+          <div style="background: var(--navy-50); border: 1px solid var(--navy-100); padding: 10px; border-radius: 6px;">
+            <div style="font-size: 11px; color: var(--text-secondary); font-weight: 600;">Beneficiaries</div>
+            <div style="font-size: 16px; font-weight: 800; color: var(--navy-950);">14,200 Persons</div>
+          </div>
+          <div style="background: var(--navy-50); border: 1px solid var(--navy-100); padding: 10px; border-radius: 6px;">
+            <div style="font-size: 11px; color: var(--text-secondary); font-weight: 600;">Est. Capex</div>
+            <div style="font-size: 16px; font-weight: 800; color: var(--navy-950);">₹3.8 Cr ($460K)</div>
+          </div>
+        </div>
+
+        <!-- EXPLAINABLE SCORE BREAKDOWN (Section 7) -->
+        <div style="margin-top: 14px;">
+          <div style="font-size: 13px; font-weight: 700; color: var(--navy-950);">
+            Explainable Priority Formula Breakdown
+          </div>
+          <div class="priority-meter" style="height: 14px; margin: 10px 0 14px;">
+            <div class="segment-volume" style="width: 35%;" title="Demand Volume: 35%"></div>
+            <div class="segment-urgency" style="width: 20%;" title="Urgency Signal: 20%"></div>
+            <div class="segment-vulnerability" style="width: 18%;" title="Demographic Vulnerability: 18%"></div>
+            <div class="segment-infra" style="width: 12%;" title="Infra Deficit: 12%"></div>
+            <div class="segment-budget" style="width: 6.4%;" title="Budget Alignment: 6.4%"></div>
+          </div>
+
+          <table class="formula-table-view">
+            <thead>
+              <tr>
+                <th>Factor</th>
+                <th>Weight</th>
+                <th>Raw Value</th>
+                <th style="text-align: right;">Score</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Citizen Demand Volume</td>
+                <td>35%</td>
+                <td>342 reports (98th %ile)</td>
+                <td style="text-align: right; font-weight: 700;">34.3 / 35.0</td>
+              </tr>
+              <tr>
+                <!-- Urgency text in terracotta -->
+                <td style="color: var(--terracotta); font-weight: 700;">Urgency NLP Signal</td>
+                <td>20%</td>
+                <td>0.89 (Contamination risk)</td>
+                <td style="text-align: right; font-weight: 700; color: var(--terracotta);">17.8 / 20.0</td>
+              </tr>
+              <tr>
+                <td>Demographic Vulnerability</td>
+                <td>20%</td>
+                <td>Index 0.91 (BPL & Tribal)</td>
+                <td style="text-align: right; font-weight: 700;">18.2 / 20.0</td>
+              </tr>
+              <tr>
+                <td>Infra Asset Deficit Index</td>
+                <td>15%</td>
+                <td>Score 0.80 (0 piped conn.)</td>
+                <td style="text-align: right; font-weight: 700;">12.0 / 15.0</td>
+              </tr>
+              <tr>
+                <td>Budget / Plan Alignment</td>
+                <td>10%</td>
+                <td>Jal Jeevan Mission (FY26)</td>
+                <td style="text-align: right; font-weight: 700;">9.1 / 10.0</td>
+              </tr>
+              <tr style="border-top: 2px solid var(--border-default); font-weight: 800;">
+                <td colspan="3">Composite Explainable Priority</td>
+                <td style="text-align: right; font-size: 14px; color: var(--navy-950);">91.4 / 100</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+
+      <!-- Grounded Policy RAG -->
+      <div class="detail-block">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <h3 style="font-size: 14.5px;">Policy-Alignment Assistant (RAG)</h3>
+          <span class="badge badge-navy">pgvector 384d</span>
+        </div>
+        <div style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;">
+          Grounded semantic query against state investment plans & master policy corpus.
+        </div>
+
+        <div class="rag-panel">
+          <input type="text" class="rag-input-box" id="ragInput" value="Does this project qualify under the 2025-27 State Water Masterplan?">
+          <button class="btn btn-primary" style="font-size: 11.5px; padding: 6px 14px; width: 100%;" onclick="runRAG()">
+            🔍 Query Policy Corpus (RAG)
+          </button>
+
+          <div id="ragCitation" class="rag-citation-box">
+            <div style="display: flex; justify-content: space-between; font-weight: 700; color: var(--navy-850); margin-bottom: 3px;">
+              <span>Source: MH_Water_Grid_Plan_2025.pdf</span>
+              <span style="color: #1B7A53;">Similarity: 0.88</span>
+            </div>
+            <div style="color: var(--text-main); font-size: 11.5px;">
+              <strong>Article 4.2 (Feeder Renewal Scheme):</strong> "Rural habitations with &gt;250 unserved households qualify for up to ₹4.5 Cr under Jal Jeevan Mission component B."
+            </div>
+            <div style="margin-top: 6px; font-size: 11.5px; color: #1B7A53; font-weight: 700;">
+              ✓ High Alignment: Project matches planned capital allocation for Jalna-Aurangabad corridor.
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top: 18px; display: flex; flex-direction: column; gap: 10px;">
+          <button class="btn btn-primary" style="width: 100%;" onclick="alert('Project endorsed! Dispatched to National Commission Queue. Audit log #AUD-9104 created.')">
+            ✓ Endorse for National Allocation
+          </button>
+          <button class="btn btn-outline" style="width: 100%;">
+            Export Hotspot Audit Dossier (PDF / JSON)
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+    function pickProject(id) {
+      document.querySelectorAll('.queue-card').forEach(c => c.classList.remove('selected'));
+      const cards = document.querySelectorAll('.queue-card');
+      if (cards[id-1]) cards[id-1].classList.add('selected');
+    }
+
+    function runRAG() {
+      const btn = event.target;
+      btn.innerText = "Querying pgvector corpus...";
+      setTimeout(() => {
+        btn.innerText = "🔍 Query Policy Corpus (RAG)";
+        document.getElementById('ragCitation').style.display = 'block';
+      }, 400);
+    }
+
+    function triggerHDBSCAN() {
+      alert("Triggering HDBSCAN clustering job... WebSocket broadcasting recalculated hotspot centroids.");
+    }
+  </script>
+</body>
+</html>

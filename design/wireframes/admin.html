@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>National Admin & BRICS Leaderboard — SETU AI</title>
+  <link rel="stylesheet" href="tokens.css">
+  <style>
+    .page-wrapper {
+      max-width: 1220px;
+      margin: 32px auto 60px;
+      padding: 0 24px;
+    }
+    .federal-banner {
+      background: linear-gradient(135deg, #FFFFFF 0%, var(--sand-50) 100%);
+      border: 1px solid var(--border-default);
+      border-radius: 12px;
+      padding: 28px 32px;
+      margin-bottom: 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: var(--shadow-sm);
+    }
+    
+    /* Metrics Summary Strip */
+    .metrics-quad {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+      margin-bottom: 28px;
+    }
+    @media (max-width: 900px) {
+      .metrics-quad {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    .kpi-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border-default);
+      border-radius: 10px;
+      padding: 20px 22px;
+      box-shadow: var(--shadow-xs);
+    }
+    .kpi-title {
+      font-size: 11.5px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 700;
+    }
+    .kpi-num {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--navy-950);
+      margin: 6px 0;
+      letter-spacing: -0.02em;
+    }
+    .kpi-foot {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    /* Tab Controls */
+    .tab-pills-wrap {
+      display: flex;
+      background: #EAE6DE;
+      padding: 4px;
+      border-radius: 10px;
+      margin-bottom: 24px;
+      border: 1px solid var(--border-default);
+    }
+    .tab-pill-btn {
+      flex: 1;
+      padding: 11px 18px;
+      text-align: center;
+      background: transparent;
+      border: none;
+      font-family: var(--font-sans);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      cursor: pointer;
+      border-radius: 8px;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .tab-pill-btn.active {
+      background: #FFFFFF;
+      color: var(--navy-850);
+      box-shadow: 0 2px 8px rgba(11, 23, 40, 0.08);
+      font-weight: 700;
+    }
+
+    /* Cross-Region Data Table */
+    .table-container {
+      background: #FFFFFF;
+      border: 1px solid var(--border-default);
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: var(--shadow-xs);
+    }
+    .admin-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+    }
+    .admin-table th {
+      background: var(--navy-50);
+      color: var(--navy-950);
+      font-weight: 700;
+      text-align: left;
+      padding: 14px 18px;
+      border-bottom: 1.5px solid var(--border-default);
+      font-size: 12px;
+      letter-spacing: 0.02em;
+    }
+    .admin-table td {
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--border-subtle);
+      vertical-align: middle;
+    }
+    .admin-table tr:hover {
+      background: var(--sand-50);
+    }
+
+    /* Impact Visualizer Grid */
+    .impact-showcase {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 22px;
+    }
+    @media (max-width: 850px) {
+      .impact-showcase {
+        grid-template-columns: 1fr;
+      }
+    }
+    .impact-box {
+      background: #FFFFFF;
+      border: 1px solid var(--border-default);
+      border-radius: 10px;
+      padding: 24px;
+      box-shadow: var(--shadow-xs);
+      transition: all 0.2s ease;
+    }
+    .impact-box:hover {
+      box-shadow: var(--shadow-sm);
+    }
+    .impact-metric-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin: 18px 0;
+      background: var(--bg-app);
+      padding: 16px;
+      border-radius: 8px;
+      border: 1px solid var(--border-subtle);
+    }
+    .metric-col-before {
+      flex: 1;
+      text-align: center;
+      border-right: 1px dashed var(--border-default);
+    }
+    .metric-col-after {
+      flex: 1;
+      text-align: center;
+    }
+
+    /* Modal Simulation */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(8, 18, 32, 0.65);
+      backdrop-filter: blur(4px);
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    .modal-card {
+      background: #FFFFFF;
+      border-radius: 12px;
+      max-width: 540px;
+      width: 90%;
+      padding: 28px;
+      box-shadow: var(--shadow-lg);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <header class="top-nav">
+    <div class="brand-container">
+      <div class="brand-symbol">से</div>
+      <a href="index.html" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 8px;">
+        <span class="brand-badge">SETU AI</span>
+        <span class="brand-title">National Commission Command</span>
+      </a>
+      <span class="brand-tagline">Federal Allocations & Cross-Border DPG Governance</span>
+    </div>
+    <div class="nav-links">
+      <span class="badge badge-sand">Role: Federal Administrator (Level 3)</span>
+      <a href="official.html" class="nav-link">Regional View</a>
+      <a href="index.html" class="nav-link">Sign Out</a>
+    </div>
+  </header>
+
+  <div class="page-wrapper">
+
+    <!-- Federal Command Banner -->
+    <div class="federal-banner">
+      <div>
+        <h1 style="font-size: 24px;">BRICS National Infrastructure Allocation & Impact Audit</h1>
+        <p style="font-size: 13.5px; color: var(--text-secondary); margin-top: 4px;">
+          Federated data model: Monitoring demand equity, project lifecycle audit logs, and verifiable ground metrics.
+        </p>
+      </div>
+      <div style="display: flex; gap: 12px;">
+        <button class="btn btn-outline" onclick="openPublicDataEndpoint()">
+          📥 Open Data API (/api/v1/public/hotspots)
+        </button>
+        <button class="btn btn-primary" onclick="alert('Exporting Full BRICS Capital Allocations Audit Dossier...')">
+          📄 Generate Audit Dossier
+        </button>
+      </div>
+    </div>
+
+    <!-- Summary KPI Quad -->
+    <div class="metrics-quad">
+      <div class="kpi-card">
+        <div class="kpi-title">Monitored Regions</div>
+        <div class="kpi-num">28 Regions</div>
+        <div class="kpi-foot">India (18) · Brazil (6) · South Africa (4)</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-title">Active Demand Hotspots</div>
+        <div class="kpi-num">842 Hotspots</div>
+        <div class="kpi-foot">Clustered from 148,240 citizen inputs</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-title">Allocated Capital</div>
+        <div class="kpi-num">$482.4M</div>
+        <div class="kpi-foot">62.4% Capital deployment rate</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-title">Completed & Audited</div>
+        <div class="kpi-num">114 Projects</div>
+        <div class="kpi-foot">100% verified with sensor & citizen feedback</div>
+      </div>
+    </div>
+
+    <!-- Dual Tab Selector -->
+    <div class="tab-pills-wrap">
+      <button class="tab-pill-btn active" id="tabLdrBtn" onclick="toggleAdminTab('leaderboard')">
+        📊 Cross-Region Leaderboard & Capital Allocations
+      </button>
+      <button class="tab-pill-btn" id="tabImpBtn" onclick="toggleAdminTab('impact')">
+        📈 Ground Impact Tracker (114 Verified Before/After Projects)
+      </button>
+    </div>
+
+    <!-- VIEW 1: CROSS-REGION LEADERBOARD -->
+    <div id="viewLeaderboard">
+      
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+        <div style="display: flex; gap: 8px;">
+          <button class="btn btn-secondary" style="font-size: 12px; padding: 6px 14px;">All BRICS</button>
+          <button class="btn btn-outline" style="font-size: 12px; padding: 6px 14px;">🇮🇳 India (MH, BR, UP)</button>
+          <button class="btn btn-outline" style="font-size: 12px; padding: 6px 14px;">🇧🇷 Brazil (MG, BA, SP)</button>
+        </div>
+        <div style="font-size: 12px; color: var(--text-muted);">
+          Data Sovereignty: Country-level sharded architecture enforced
+        </div>
+      </div>
+
+      <div class="table-container">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Region / Jurisdiction</th>
+              <th>Top Demand Sector</th>
+              <th>Citizen Reports</th>
+              <th>Avg. Urgency</th>
+              <th>Allocated Capex</th>
+              <th>Lifecycle Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Row 1: Maharashtra -->
+            <tr>
+              <td>
+                <strong style="color: var(--navy-950);">Maharashtra (IN-MH)</strong>
+                <div style="font-size: 12px; color: var(--text-secondary);">Aurangabad & Jalna · Pop: 112M</div>
+              </td>
+              <td>
+                <span class="badge badge-sand">Drinking Water (62%)</span>
+              </td>
+              <td>
+                <strong>342</strong> in Hotspot #WTR-04
+              </td>
+              <td>
+                <!-- Terracotta ONLY for Critical Urgency -->
+                <span class="badge badge-urgency">0.89 (Critical)</span>
+              </td>
+              <td>
+                <strong>₹3.8 Cr</strong> ($460K)
+              </td>
+              <td>
+                <button class="btn btn-primary" style="font-size: 11.5px; padding: 6px 12px;" onclick="promptModal('Badnapur Feeder Pipeline Renewal', 'Recommended', 'Funded')">
+                  Transition: Mark "Funded" →
+                </button>
+              </td>
+            </tr>
+
+            <!-- Row 2: Minas Gerais -->
+            <tr>
+              <td>
+                <strong style="color: var(--navy-950);">Minas Gerais (BR-MG)</strong>
+                <div style="font-size: 12px; color: var(--text-secondary);">Vale do Jequitinhonha · Pop: 21.4M</div>
+              </td>
+              <td>
+                <span class="badge badge-navy">Rural Power (54%)</span>
+              </td>
+              <td>
+                <strong>210</strong> in Hotspot #BR-ENG-01
+              </td>
+              <td>
+                <span class="badge badge-sand">0.72 (Moderate)</span>
+              </td>
+              <td>
+                <strong>R$ 2.4M</strong> ($440K)
+              </td>
+              <td>
+                <button class="btn btn-outline" style="font-size: 11.5px; padding: 6px 12px;" onclick="promptModal('Jequitinhonha Solar Microgrid', 'Funded', 'In Progress')">
+                  Transition: Mark "In Progress" →
+                </button>
+              </td>
+            </tr>
+
+            <!-- Row 3: Bihar -->
+            <tr>
+              <td>
+                <strong style="color: var(--navy-950);">Bihar (IN-BR)</strong>
+                <div style="font-size: 12px; color: var(--text-secondary);">Koshi River Basin · Pop: 124M</div>
+              </td>
+              <td>
+                <span class="badge badge-sand">Flood Culverts & Drainage</span>
+              </td>
+              <td>
+                <strong>415</strong> in Hotspot #BR-FL-02
+              </td>
+              <td>
+                <!-- Terracotta ONLY for Critical Urgency -->
+                <span class="badge badge-urgency">0.94 (Critical)</span>
+              </td>
+              <td>
+                <strong>₹7.5 Cr</strong> ($910K)
+              </td>
+              <td>
+                <button class="btn btn-outline" style="font-size: 11.5px; padding: 6px 12px;" onclick="promptModal('Koshi Embankment Culvert Reinforcement', 'In Progress', 'Completed')">
+                  Transition: Mark "Completed" →
+                </button>
+              </td>
+            </tr>
+
+            <!-- Row 4: Bahia -->
+            <tr>
+              <td>
+                <strong style="color: var(--navy-950);">Bahia (BR-BA)</strong>
+                <div style="font-size: 12px; color: var(--text-secondary);">Sertão Semiárido · Pop: 14.8M</div>
+              </td>
+              <td>
+                <span class="badge badge-sand">Cistern Water Harvesting</span>
+              </td>
+              <td>
+                <strong>185</strong> in Hotspot #BA-WTR-07
+              </td>
+              <td>
+                <span class="badge badge-sand">0.68 (Standard)</span>
+              </td>
+              <td>
+                <strong>R$ 1.8M</strong> ($330K)
+              </td>
+              <td>
+                <button class="btn btn-secondary" style="font-size: 11.5px; padding: 6px 12px;" onclick="alert('Status already Completed. Audited in Impact Tracker.')">
+                  ✓ Completed & Audited
+                </button>
+              </td>
+            </tr>
+
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+
+    <!-- VIEW 2: IMPACT TRACKER -->
+    <div id="viewImpact" style="display: none;">
+      
+      <div style="margin-bottom: 20px;">
+        <h2 style="font-size: 18px;">Before & After Physical Impact Tracking</h2>
+        <p style="font-size: 13px; color: var(--text-secondary); margin-top: 3px;">
+          Grounded validation: Measuring whether capital expenditures actually cured the citizen demand hotspots that initiated them.
+        </p>
+      </div>
+
+      <div class="impact-showcase">
+
+        <!-- Card 1: Water Access -->
+        <div class="impact-box">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div>
+              <span class="badge badge-success">Completed & Verified</span>
+              <h3 style="font-size: 16px; margin-top: 6px;">Jalna District Piped Water Feeder Reinforcement</h3>
+              <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Hotspot #IN-MH-WTR-01 · Completed July 2026</div>
+            </div>
+            <span class="badge badge-navy">12,400 Residents</span>
+          </div>
+
+          <div class="impact-metric-row">
+            <div class="metric-col-before">
+              <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Before (Complaints)</div>
+              <div style="font-size: 22px; font-weight: 800; color: var(--text-muted); margin: 4px 0;">1.5 hrs/day</div>
+              <div style="font-size: 12px; color: var(--text-secondary);">Contaminated well water</div>
+            </div>
+            <div style="font-size: 22px; color: var(--navy-850);">➔</div>
+            <div class="metric-col-after">
+              <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">After (Sensor Verified)</div>
+              <div style="font-size: 24px; font-weight: 800; color: #1B7A53; margin: 4px 0;">18.5 hrs/day</div>
+              <div style="font-size: 12px; color: #1B7A53; font-weight: 700;">+1,133% Clean Water Access</div>
+            </div>
+          </div>
+
+          <div style="font-size: 12.5px; color: var(--text-secondary); background: var(--sand-50); border: 1px solid var(--sand-300); padding: 12px; border-radius: 6px;">
+            💬 <strong>Citizen Sentiment Confirmation:</strong> Follow-up survey via SMS verified 94.2% satisfaction. Citizen grievance volume in ward dropped from 340/month to 4/month.
+          </div>
+        </div>
+
+        <!-- Card 2: Road & Emergency Transit -->
+        <div class="impact-box">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div>
+              <span class="badge badge-success">Completed & Verified</span>
+              <h3 style="font-size: 16px; margin-top: 6px;">State Highway 176 Culvert Reconstruction</h3>
+              <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">Hotspot #IN-MH-RD-03 · Completed May 2026</div>
+            </div>
+            <span class="badge badge-navy">45,000 Commuters</span>
+          </div>
+
+          <div class="impact-metric-row">
+            <div class="metric-col-before">
+              <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Before (Travel Time)</div>
+              <div style="font-size: 22px; font-weight: 800; color: var(--text-muted); margin: 4px 0;">95 mins</div>
+              <div style="font-size: 12px; color: var(--text-secondary);">Monsoon washouts</div>
+            </div>
+            <div style="font-size: 22px; color: var(--navy-850);">➔</div>
+            <div class="metric-col-after">
+              <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">After (Paved All-Weather)</div>
+              <div style="font-size: 24px; font-weight: 800; color: #1B7A53; margin: 4px 0;">26 mins</div>
+              <div style="font-size: 12px; color: #1B7A53; font-weight: 700;">-72% Ambulance Transit Time</div>
+            </div>
+          </div>
+
+          <div style="font-size: 12.5px; color: var(--text-secondary); background: var(--sand-50); border: 1px solid var(--sand-300); padding: 12px; border-radius: 6px;">
+            🚑 <strong>Healthcare Transit Metric:</strong> District ambulance dispatch reports zero impassable weather incidents since bridge inauguration.
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Lifecycle Audit Log Modal Simulation -->
+  <div class="modal-overlay" id="lifecycleModal">
+    <div class="modal-card">
+      <h3 style="font-size: 19px; margin-bottom: 8px;">Confirm Capital Project Status Transition</h3>
+      <div id="modalBody" style="font-size: 13.5px; color: var(--text-secondary); margin-bottom: 18px;"></div>
+
+      <div style="background: var(--sand-50); border: 1px solid var(--sand-400); border-radius: 6px; padding: 14px; font-size: 12.5px; margin-bottom: 20px;">
+        <strong>Audit Trail Notice:</strong> This action will be permanently logged in <code>audit_logs</code> table with Actor ID, timestamp, and JSON delta for transparency.
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 10px;">
+        <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="confirmTransition()">Confirm & Commit to Audit Log</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function toggleAdminTab(mode) {
+      if (mode === 'leaderboard') {
+        document.getElementById('viewLeaderboard').style.display = 'block';
+        document.getElementById('viewImpact').style.display = 'none';
+        document.getElementById('tabLdrBtn').classList.add('active');
+        document.getElementById('tabImpBtn').classList.remove('active');
+      } else {
+        document.getElementById('viewLeaderboard').style.display = 'none';
+        document.getElementById('viewImpact').style.display = 'block';
+        document.getElementById('tabLdrBtn').classList.remove('active');
+        document.getElementById('tabImpBtn').classList.add('active');
+      }
+    }
+
+    let pTitle = "";
+    let pNext = "";
+
+    function promptModal(title, current, next) {
+      pTitle = title;
+      pNext = next;
+      document.getElementById('modalBody').innerHTML = `
+        <strong>Project:</strong> ${title}<br>
+        <strong>Transition:</strong> <span class="badge badge-sand">${current}</span> ➔ <span class="badge badge-navy">${next}</span>
+      `;
+      document.getElementById('lifecycleModal').style.display = 'flex';
+    }
+
+    function closeModal() {
+      document.getElementById('lifecycleModal').style.display = 'none';
+    }
+
+    function confirmTransition() {
+      alert(`Status updated to "${pNext}". Audit log generated: #AUD-2026-9912. WebSockets pushed event to Regional Dashboard.`);
+      closeModal();
+    }
+
+    function openPublicDataEndpoint() {
+      alert("Opening Public Open Data Endpoint:\nGET /api/v1/public/hotspots\nReturns anonymized GeoJSON feature collection under Open Government Data License.");
+    }
+  </script>
+</body>
+</html>

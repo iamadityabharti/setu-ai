@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SETU AI — Digital Public Good for Civic Infrastructure</title>
+  <link rel="stylesheet" href="tokens.css">
+  <style>
+    .hero-wrap {
+      background: radial-gradient(120% 80% at 50% 0%, #FFFFFF 0%, var(--bg-app) 100%);
+      padding: 72px 24px 54px;
+      border-bottom: 1px solid var(--border-default);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-wrap::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image: 
+        linear-gradient(rgba(19, 42, 76, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(19, 42, 76, 0.03) 1px, transparent 1px);
+      background-size: 32px 32px;
+      pointer-events: none;
+    }
+    .hero-badge-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #FFFFFF;
+      border: 1px solid var(--sand-400);
+      padding: 6px 16px;
+      border-radius: 30px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--navy-850);
+      margin-bottom: 24px;
+      box-shadow: var(--shadow-xs);
+    }
+    .hero-h1 {
+      font-size: 46px;
+      font-weight: 700;
+      color: var(--navy-950);
+      max-width: 860px;
+      margin: 0 auto 20px;
+      letter-spacing: -0.03em;
+      line-height: 1.18;
+    }
+    .hero-p {
+      font-size: 18.5px;
+      color: var(--text-secondary);
+      max-width: 720px;
+      margin: 0 auto 36px;
+      line-height: 1.6;
+    }
+    .brics-strip {
+      max-width: 860px;
+      margin: 0 auto;
+      background: #FFFFFF;
+      border: 1px solid var(--border-default);
+      border-radius: 10px;
+      padding: 14px 22px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: var(--shadow-xs);
+    }
+
+    /* Persona Portal Grid */
+    .persona-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      max-width: 1180px;
+      margin: -36px auto 50px;
+      padding: 0 24px;
+      position: relative;
+      z-index: 10;
+    }
+    @media (max-width: 900px) {
+      .persona-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .persona-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border-default);
+      border-radius: 12px;
+      padding: 32px 28px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+    }
+    .persona-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-md);
+      border-color: var(--sand-500);
+    }
+    .persona-card.citizen { border-top: 4px solid var(--sand-500); }
+    .persona-card.official { border-top: 4px solid var(--navy-700); }
+    .persona-card.admin { border-top: 4px solid var(--navy-950); }
+
+    .persona-icon-box {
+      width: 50px;
+      height: 50px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      margin-bottom: 20px;
+    }
+
+    /* Ticker Stats */
+    .metrics-ribbon {
+      background: #FFFFFF;
+      border-top: 1px solid var(--border-default);
+      border-bottom: 1px solid var(--border-default);
+      padding: 40px 24px;
+      margin: 40px 0;
+    }
+    .metrics-container {
+      max-width: 1180px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+      text-align: center;
+    }
+    .metric-big {
+      font-size: 36px;
+      font-weight: 800;
+      color: var(--navy-950);
+      letter-spacing: -0.03em;
+    }
+    .metric-sub {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-top: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <header class="top-nav">
+    <div class="brand-container">
+      <div class="brand-symbol">से</div>
+      <a href="index.html" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px;">
+        <span class="brand-badge">SETU AI</span>
+        <span class="brand-title">सेतु · Digital Public Good</span>
+      </a>
+      <span class="brand-tagline">Civic Infrastructure Intelligence Platform</span>
+    </div>
+    <div class="nav-links">
+      <select class="lang-select-box" id="langSelector" onchange="switchLanguage(this.value)">
+        <option value="en">English (Global)</option>
+        <option value="hi">हिन्दी (Hindi)</option>
+        <option value="pt">Português (Brasil)</option>
+        <option value="ru">Русский (Russian)</option>
+        <option value="zh">中文 (Chinese)</option>
+      </select>
+      <a href="citizen.html" class="nav-link">Citizen Voice</a>
+      <a href="official.html" class="nav-link">Regional Dashboard</a>
+      <a href="admin.html" class="nav-link">National Admin</a>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero-wrap">
+    <div class="hero-badge-pill">
+      <span>🏛️ Interoperable Digital Public Infrastructure for BRICS Nations</span>
+    </div>
+    <h1 class="hero-h1 font-serif" id="heroHeadline">
+      Bridging citizen needs with national capital expenditure.
+    </h1>
+    <p class="hero-p" id="heroSubtext">
+      Setu AI ingests voice notes, SMS, and WhatsApp reports across multiple languages, synthesizes citizen demand hotspots with spatial AI, and produces explainable, audit-ready infrastructure priorities.
+    </p>
+
+    <!-- Multilingual Ingestion Bar -->
+    <div class="brics-strip">
+      <div style="text-align: left;">
+        <div style="font-size: 11px; font-weight: 700; color: var(--navy-850); text-transform: uppercase; letter-spacing: 0.05em;">
+          Live Multilingual NLU Synthesizer:
+        </div>
+        <div id="sampleQuote" style="font-size: 14.5px; color: var(--text-main); font-style: italic; margin-top: 3px; font-weight: 500;">
+          "Our village well dried up 3 weeks ago; 450 families must walk 4km for drinking water."
+        </div>
+      </div>
+      <div style="display: flex; gap: 8px;">
+        <span class="badge badge-sand">🇮🇳 IND</span>
+        <span class="badge badge-sand">🇧🇷 BRA</span>
+        <span class="badge badge-sand">🇷🇺 RUS</span>
+        <span class="badge badge-sand">🇨🇳 CHN</span>
+        <span class="badge badge-sand">🇿🇦 ZAF</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Persona Gateways -->
+  <main class="persona-grid">
+    
+    <!-- Persona 1: Citizen -->
+    <div class="persona-card citizen">
+      <div>
+        <div class="persona-icon-box" style="background: var(--sand-200); color: var(--navy-950);">🗣️</div>
+        <h2 style="font-size: 21px; margin-bottom: 8px;">Citizen Voice Portal</h2>
+        <div style="display: inline-block; font-size: 12px; font-weight: 700; color: var(--navy-850); background: var(--navy-50); padding: 4px 10px; border-radius: 4px; margin-bottom: 14px;">
+          Top Task: Submit voice/text grievance & track live status
+        </div>
+        <p style="font-size: 14px; color: var(--text-secondary); line-height: 1.55; margin-bottom: 24px;">
+          Civic-first interface with large tap targets. Speak in local dialect with automatic Whisper transcription, or submit via WhatsApp and SMS without smartphone requirements.
+        </p>
+      </div>
+      <div>
+        <a href="citizen.html" class="btn btn-secondary" style="width: 100%; font-size: 14.5px;">
+          Launch Citizen Portal →
+        </a>
+      </div>
+    </div>
+
+    <!-- Persona 2: Regional Official -->
+    <div class="persona-card official">
+      <div>
+        <div class="persona-icon-box" style="background: var(--navy-50); color: var(--navy-850);">🗺️</div>
+        <h2 style="font-size: 21px; margin-bottom: 8px;">Regional Official Command</h2>
+        <div style="display: inline-block; font-size: 12px; font-weight: 700; color: var(--navy-850); background: var(--navy-50); padding: 4px 10px; border-radius: 4px; margin-bottom: 14px;">
+          Top Task: Review clustered hotspots & verify project queue
+        </div>
+        <p style="font-size: 14px; color: var(--text-secondary); line-height: 1.55; margin-bottom: 24px;">
+          State and municipal planners view geospatial clusters fused with demographic vulnerability and asset deficit indices. Includes an embedded RAG Policy Assistant.
+        </p>
+      </div>
+      <div>
+        <a href="official.html" class="btn btn-primary" style="width: 100%; font-size: 14.5px;">
+          Open Regional Dashboard →
+        </a>
+      </div>
+    </div>
+
+    <!-- Persona 3: National Admin -->
+    <div class="persona-card admin">
+      <div>
+        <div class="persona-icon-box" style="background: var(--sand-100); color: var(--navy-950);">⚖️</div>
+        <h2 style="font-size: 21px; margin-bottom: 8px;">National Commission</h2>
+        <div style="display: inline-block; font-size: 12px; font-weight: 700; color: var(--navy-850); background: var(--navy-50); padding: 4px 10px; border-radius: 4px; margin-bottom: 14px;">
+          Top Task: Cross-region allocation & before/after impact tracking
+        </div>
+        <p style="font-size: 14px; color: var(--text-secondary); line-height: 1.55; margin-bottom: 24px;">
+          Federal decision-makers monitor cross-region infrastructure disparity, transition project funding states with strict audit logs, and measure physical ground impact.
+        </p>
+      </div>
+      <div>
+        <a href="admin.html" class="btn btn-outline" style="width: 100%; font-size: 14.5px;">
+          Access National Overview →
+        </a>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Metrics Ribbon -->
+  <section class="metrics-ribbon">
+    <div class="metrics-container">
+      <div>
+        <div class="metric-big">148,240</div>
+        <div class="metric-sub">Citizen Reports Ingested</div>
+      </div>
+      <div>
+        <div class="metric-big">842</div>
+        <div class="metric-sub">AI Demand Hotspots</div>
+      </div>
+      <div>
+        <div class="metric-big">$2.4B</div>
+        <div class="metric-sub">Capital Directed</div>
+      </div>
+      <div>
+        <div class="metric-big">100%</div>
+        <div class="metric-sub">Explainable Formula</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer-banner">
+    <div style="max-width: 1180px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        <strong>SETU AI Platform</strong> · Built under Digital Public Goods Alliance Guidelines (DPG).
+        <div style="opacity: 0.75; margin-top: 4px;">Open Standards, Privacy-Preserving Ingestion, Federated Multi-Nation Architecture.</div>
+      </div>
+      <div style="display: flex; gap: 20px;">
+        <a href="tokens.css" style="color: var(--sand-400); text-decoration: none;">Design Tokens</a>
+        <a href="official.html" style="color: var(--sand-400); text-decoration: none;">Regional Command</a>
+        <a href="admin.html" style="color: var(--sand-400); text-decoration: none;">National Admin</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const i18n = {
+      en: {
+        title: "Bridging citizen needs with national capital expenditure.",
+        sub: "Setu AI ingests voice notes, SMS, and WhatsApp reports across multiple languages, synthesizes citizen demand hotspots with spatial AI, and produces explainable, audit-ready infrastructure priorities.",
+        quote: '"Our village well dried up 3 weeks ago; 450 families must walk 4km for drinking water."'
+      },
+      hi: {
+        title: "नागरिकों की आवाज़ को राष्ट्रीय विकास बजट से जोड़ना।",
+        sub: "सेतु एआई आवाज़, एसएमएस और व्हाट्सएप रिपोर्ट को कई भाषाओं में एकीकृत करता है और पारदर्शी बुनियादी ढांचा प्राथमिकताएं तैयार करता है।",
+        quote: '"हमारे गांव का कुआं 3 हफ्ते पहले सूख गया; 450 परिवारों को पीने के पानी के लिए 4 किमी पैदल चलना पड़ता है।"'
+      },
+      pt: {
+        title: "Conectando as necessidades dos cidadãos aos investimentos federais.",
+        sub: "O Setu AI recebe relatos por voz, texto, SMS e WhatsApp em múltiplos idiomas, agrupando pontos críticos de demanda pública com IA explicável.",
+        quote: '"Nosso posto de saúde está sem água potável há 3 semanas; moradores precisam se deslocar até o município vizinho."'
+      },
+      ru: {
+        title: "Объединение запросов граждан с национальным планом развития.",
+        sub: "Setu AI объединяет голосовые и текстовые сообщения граждан, выявляет критические инфраструктурные потребности и формирует проверяемые приоритеты.",
+        quote: '"В нашей деревне пересох колодец 3 недели назад; сотни семей вынуждены возить воду за несколько километров."'
+      },
+      zh: {
+        title: "架设公民需求与国家基础设施投资规划的坚实桥梁。",
+        sub: "Setu AI 支持多语言语音、文字与短信诉求输入，利用空间智能聚类生成需求热点，输出透明可审计的高优先级民生项目工程。",
+        quote: '"我们村的供水管网破损已达3周，450户村民不得不步行4公里取用日常饮用水。"'
+      }
+    };
+
+    function switchLanguage(lang) {
+      if (i18n[lang]) {
+        document.getElementById('heroHeadline').innerText = i18n[lang].title;
+        document.getElementById('heroSubtext').innerText = i18n[lang].sub;
+        document.getElementById('sampleQuote').innerText = i18n[lang].quote;
+      }
+    }
+  </script>
+</body>
+</html>
