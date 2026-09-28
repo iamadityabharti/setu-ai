@@ -4,6 +4,9 @@
 > **"Setu" = Bridge in Hindi.**  
 > SETU AI is a sovereign, interoperable Digital Public Good platform that bridges citizen voices directly into national capital expenditure planning across BRICS nations.
 
+🌐 **Live Production Deployment**: [https://setu-ai.netlify.app](https://setu-ai.netlify.app)  
+📦 **GitHub Repository**: [https://github.com/iamadityabharti/setu-ai](https://github.com/iamadityabharti/setu-ai)
+
 ---
 
 ## 1. Problem Statement & Mission
